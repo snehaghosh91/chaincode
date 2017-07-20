@@ -177,7 +177,7 @@ func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []str
 	lastname := args[2]
 	
 	//check if user already exists
-	user, err := stub.GetState(email)
+	_, err := stub.GetState(email)
 	if err == nil {
 		fmt.Println("This user already exists - " + email)
 		return nil, errors.New("This user exists - " + email)  //all stop a ticket by this id exists
