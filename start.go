@@ -219,12 +219,6 @@ func (t *SimpleChaincode) init_user_new(stub shim.ChaincodeStubInterface, args [
 	user.Lastname = args[2]
 	fmt.Println(user)
 	
-        email := args[0]
-        _, err = stub.GetState(email)
-	if err == nil {
-		fmt.Println("This user already exists - " + email)
-		return nil, errors.New(err.Error())
-	}
 
 	//store user
 	userAsBytes, _ := json.Marshal(user)	//convert to array of bytes
