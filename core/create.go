@@ -58,9 +58,9 @@ func init_user(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	fmt.Println(user)
         email := args[0]
         _, err = stub.GetState(email)
-	if err == nil {
+	if err != nil {
 		fmt.Println("This user already exists - " + email)
-		return nil, errors.New("This user exists - " + email)  //all stop a ticket by this id exists
+		return nil, errors.New("This user exists - " + email)
 	}
 
 	//store user
