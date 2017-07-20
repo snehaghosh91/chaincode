@@ -9,7 +9,11 @@ import (
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
 )
-
+type User struct {
+	Email string `json:"email"`
+	Firstname string `json:"firstname"`
+	Lastname string `json:"lastname"`
+}
 func write(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	var key, value string
 	var err error
@@ -49,9 +53,7 @@ func init_user(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-
-	var user User
-	user.ObjectType = "user"
+	user := User{};
 	user.Email =  args[0]
 	user.Firstname = args[1]
 	user.Lastname = args[2]
@@ -60,7 +62,7 @@ func init_user(stub shim.ChaincodeStubInterface, args []string) pb.Response {
         _, err = stub.GetState(email)
 	if err != nil {
 		fmt.Println("This user already exists - " + email)
-		return nil, errors.New("This user exists - " + email)
+		return nil, shim.Error(err.Error())
 	}
 
 	//store user
