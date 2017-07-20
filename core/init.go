@@ -1,12 +1,9 @@
 /*
 Copyright IBM Corp 2016 All Rights Reserved.
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
 		 http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,9 +16,8 @@ package main
 import (
 	"errors"
 	"fmt"
-	//"strconv"
+
 	"github.com/hyperledger/fabric/core/chaincode/shim"
-	//pb "github.com/hyperledger/fabric/protos/peer"
 )
 
 // SimpleChaincode example simple Chaincode implementation
@@ -58,10 +54,6 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		return t.Init(stub, "init", args)
 	} else if function == "write" {
 		return t.write(stub, args)
-	} else if function == "init_user" {
-		return t.init_user(stub, args)
-	} else if function == "init_project" {
-		return t.init_project(stub, args)
 	}
 	fmt.Println("invoke did not find func: " + function)
 
@@ -117,84 +109,4 @@ func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) 
 	}
 
 	return valAsbytes, nil
-}
-
-func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	var err error
-	fmt.Println("Starting init_project")
-	if len(args) != 4 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 4")
-	}
-
-	project_id := args[0]
-	name := args[1]
-	owner := args[2]
-	moneyGoal := args[3]
-	moneyDonated := "0"
-
-	//check if owner exists
-	//user, err := get_user(stub, owner)
-	//if err != nil {
-	//	fmt.Println("Failed to find user - " + owner)
-	//	return nil, errors.New(err.Error())
-	//}
-
-	//check if ticket id already exists
-	project, err := stub.GetState(project_id)
-	if err == nil {
-		fmt.Println("This project already exists - " + project_id)
-		fmt.Println(project)
-		return nil, errors.New("This ticket project exists - " + project_id)  //all stop a ticket by this id exists
-	}
-
-	//build the ticket json string manually
-	str := `{
-		"docType":"project", 
-		"project_id": "` + project_id + `", 
-		"name": "` + name + `", 
-		"owner": "` + owner + `", 
-"moneyGoal": "` + moneyGoal + `",
-"moneyDonated": "` + moneyDonated + `"
-	}`
-	err = stub.PutState(project_id, []byte(str)) 	//store project with id as key
-	if err != nil {
-		return nil, errors.New(err.Error())
-	}
-
-	fmt.Println("- end init_project")
-	return nil, nil
-}
-
-func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	var err error
-	fmt.Println("Starting init_user")
-	if len(args) != 3 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 4")
-	}
-				  
-	email := args[0]
-	firstname := args[1]
-	lastname := args[2]
-	
-	//check if user already exists
-	_, err = stub.GetState(email)
-	if err == nil {
-		fmt.Println("This user already exists - " + email)
-		return nil, errors.New("This user exists - " + email)  //all stop a ticket by this id exists
-	}
-
-	//build the user json string manually
-	str := `{
-		"docType":"user", 
-		"email": "` + email + `", 
-		"firstname": "` + firstname + `", 
-		"lastname": "` + lastname + `"
-	}`
-	err = stub.PutState(email, []byte(str)) 	//store project with id as key
-	if err != nil {
-		return nil, errors.New(err.Error())
-	}
-
-	fmt.Println("- end init_user")
-	return nil, nil
 }
