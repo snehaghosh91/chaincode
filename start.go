@@ -223,7 +223,7 @@ func (t *SimpleChaincode) init_user_new(stub shim.ChaincodeStubInterface, args [
         _, err = stub.GetState(email)
 	if err == nil {
 		fmt.Println("This user already exists - " + email)
-		return nil, shim.Error(err.Error())
+		return nil, errors.New(err.Error())
 	}
 
 	//store user
@@ -231,9 +231,9 @@ func (t *SimpleChaincode) init_user_new(stub shim.ChaincodeStubInterface, args [
 	err = stub.PutState(user.Email, userAsBytes)	  //store owner by its Id
 	if err != nil {
 		fmt.Println("Could not store user")
-		return nil, shim.Error(err.Error())
+		return nil, errors.New(err.Error())
 	}
 	
 	fmt.Println("- end init_user")
-	return nil, shim.Success(nil)	
+	return nil, nil	
 }
