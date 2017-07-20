@@ -17,13 +17,18 @@ limitations under the License.
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	//"strconv"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	//pb "github.com/hyperledger/fabric/protos/peer"
 )
-
+type User struct {
+	Email string `json:"email"`
+	Firstname string `json:"firstname"`
+	Lastname string `json:"lastname"`
+}
 // SimpleChaincode example simple Chaincode implementation
 type SimpleChaincode struct {
 }
@@ -197,4 +202,36 @@ func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []str
 
 	fmt.Println("- end init_user")
 	return nil, nil
+}
+
+
+func (t *SimpleChaincode) init_user_new(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var err error
+	fmt.Println("Starting init_user")
+	if len(args) != 3 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 3")
+	}
+	user := User{};
+	user.Email =  args[0]
+	user.Firstname = args[1]
+	user.Lastname = args[2]
+	fmt.Println(user)
+	
+        email := args[0]
+        _, err = stub.GetState(email)
+	if err == nil {
+		fmt.Println("This user already exists - " + email)
+		return nil, shim.Error(err.Error())
+	}
+
+	//store user
+	userAsBytes, _ := json.Marshal(user)	//convert to array of bytes
+	err = stub.PutState(user.Email, userAsBytes)	  //store owner by its Id
+	if err != nil {
+		fmt.Println("Could not store user")
+		return nil, shim.Error(err.Error())
+	}
+	
+	fmt.Println("- end init_user")
+	return nil, shim.Success(nil)	
 }
