@@ -130,7 +130,7 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 	name := args[1]
 	owner := args[2]
 	moneyGoal := args[3]
-	moneyDonated := 0
+	moneyDonated := "0"
 
 	//check if owner exists
 	//user, err := get_user(stub, owner)
@@ -153,8 +153,8 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 		"project_id": "` + project_id + `", 
 		"name": "` + name + `", 
 		"owner": "` + owner + `", 
-"moneyGoal": "` + strconv.Itoa(moneyGoal) + `",
-"moneyDonated": "` + strconv.Itoa(moneyDonated) + `"
+"moneyGoal": "` + moneyGoal + `",
+"moneyDonated": "` + moneyDonated + `"
 	}`
 	err = stub.PutState(project_id, []byte(str)) 	//store project with id as key
 	if err != nil {
@@ -180,7 +180,6 @@ func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []str
 	user, err := stub.GetState(email)
 	if err == nil {
 		fmt.Println("This user already exists - " + email)
-		fmt.Println(project)
 		return nil, errors.New("This user exists - " + email)  //all stop a ticket by this id exists
 	}
 
