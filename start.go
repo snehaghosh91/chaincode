@@ -19,7 +19,7 @@ package main
 import (
 	"errors"
 	"fmt"
-
+	"strconv"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
 )
@@ -153,8 +153,8 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 		"project_id": "` + project_id + `", 
 		"name": "` + name + `", 
 		"owner": "` + owner + `", 
-		"moneyGoal": "` + moneyGoal + `",
-		"moneyDonated": "` + moneyDonated + `"
+"moneyGoal": "` + strconv.Itoa(moneyGoal) + `",
+"moneyDonated": "` + strconv.Itoa(moneyDonated) + `"
 	}`
 	err = stub.PutState(project_id, []byte(str)) 	//store project with id as key
 	if err != nil {
@@ -163,24 +163,6 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 
 	fmt.Println("- end init_project")
 	return nil, nil
-}
-				  
-func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	var key, jsonResp string
-	var err error
-
-	if len(args) != 1 {
-		return nil, errors.New("Incorrect number of arguments. Expecting name of the key to query")
-	}
-
-	key = args[0]
-	valAsbytes, err := stub.GetState(key)
-	if err != nil {
-		jsonResp = "{\"Error\":\"Failed to get state for " + key + "\"}"
-		return nil, errors.New(jsonResp)
-	}
-
-	return valAsbytes, nil
 }
 
 func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
