@@ -57,6 +57,10 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		return t.Init(stub, "init", args)
 	} else if function == "write" {
 		return t.write(stub, args)
+	} else if function == "init_user" {
+		return t.init_user(stub, args)
+	} else if function == "init_project" {
+		return t.init_project(stub, args)
 	}
 	fmt.Println("invoke did not find func: " + function)
 
@@ -112,4 +116,113 @@ func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) 
 	}
 
 	return valAsbytes, nil
+}
+
+func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []string) (pb.Response) {
+	fmt.Println("Starting init_project")
+	if len(args) != 4 {
+		return shim.Error("Incorrect number of arguments. Expecting 4)
+	}
+				  
+	//input sanitation
+	err = sanitize_arguments(args)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	project_id := args[0]
+	name := args[1]
+	owner := args[2]
+	moneyGoal := args[3]
+	moneyDonated := 0
+
+	//check if owner exists
+	user, err := get_user(stub, owner)
+	if err != nil {
+		fmt.Println("Failed to find user - " + owner)
+		return shim.Error(err.Error())
+	}
+
+	//check if ticket id already exists
+	project, err := stub.GetState(project_id)
+	if err == nil {
+		fmt.Println("This project already exists - " + project_id)
+		fmt.Println(project)
+		return shim.Error("This ticket project exists - " + project_id)  //all stop a ticket by this id exists
+	}
+
+	//build the ticket json string manually
+	str := `{
+		"docType":"project", 
+		"project_id": "` + project_id + `", 
+		"name": "` + name + `", 
+		"owner": "` + owner + `", 
+		"moneyGoal": "` + moneyGoal + `",
+		"moneyDonated": "` + moneyDonated + `"
+	}`
+	err = stub.PutState(project_id, []byte(str)) 	//store project with id as key
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	fmt.Println("- end init_project")
+	return shim.Success(nil)
+}
+				  
+func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var key, jsonResp string
+	var err error
+
+	if len(args) != 1 {
+		return nil, errors.New("Incorrect number of arguments. Expecting name of the key to query")
+	}
+
+	key = args[0]
+	valAsbytes, err := stub.GetState(key)
+	if err != nil {
+		jsonResp = "{\"Error\":\"Failed to get state for " + key + "\"}"
+		return nil, errors.New(jsonResp)
+	}
+
+	return valAsbytes, nil
+}
+
+func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []string) (pb.Response) {
+	fmt.Println("Starting init_user")
+	if len(args) != 3 {
+		return shim.Error("Incorrect number of arguments. Expecting 4)
+	}
+				  
+	//input sanitation
+	err = sanitize_arguments(args)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	email := args[0]
+	firstname := args[1]
+	lastname := args[2]
+	
+	//check if user already exists
+	user, err := stub.GetState(email)
+	if err == nil {
+		fmt.Println("This user already exists - " + email)
+		fmt.Println(project)
+		return shim.Error("This user exists - " + email)  //all stop a ticket by this id exists
+	}
+
+	//build the user json string manually
+	str := `{
+		"docType":"user", 
+		"email": "` + email + `", 
+		"firstname": "` + firstname + `", 
+		"lastname": "` + lastname + `"
+	}`
+	err = stub.PutState(email, []byte(str)) 	//store project with id as key
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	fmt.Println("- end init_user")
+	return shim.Success(nil)
 }
