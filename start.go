@@ -118,16 +118,16 @@ func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) 
 	return valAsbytes, nil
 }
 
-func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []string) (pb.Response) {
+func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Println("Starting init_project")
 	if len(args) != 4 {
-		return shim.Error("Incorrect number of arguments. Expecting 4")
+		return nil, shim.Error("Incorrect number of arguments. Expecting 4")
 	}
 				  
 	//input sanitation
 	err = sanitize_arguments(args)
 	if err != nil {
-		return shim.Error(err.Error())
+		return nil, shim.Error(err.Error())
 	}
 
 	project_id := args[0]
@@ -140,7 +140,7 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 	user, err := get_user(stub, owner)
 	if err != nil {
 		fmt.Println("Failed to find user - " + owner)
-		return shim.Error(err.Error())
+		return nil, shim.Error(err.Error())
 	}
 
 	//check if ticket id already exists
@@ -148,7 +148,7 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 	if err == nil {
 		fmt.Println("This project already exists - " + project_id)
 		fmt.Println(project)
-		return shim.Error("This ticket project exists - " + project_id)  //all stop a ticket by this id exists
+		return nil, shim.Error("This ticket project exists - " + project_id)  //all stop a ticket by this id exists
 	}
 
 	//build the ticket json string manually
@@ -162,11 +162,11 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 	}`
 	err = stub.PutState(project_id, []byte(str)) 	//store project with id as key
 	if err != nil {
-		return shim.Error(err.Error())
+		return nil, shim.Error(err.Error())
 	}
 
 	fmt.Println("- end init_project")
-	return shim.Success(nil)
+	return nil, nil
 }
 				  
 func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
@@ -187,16 +187,16 @@ func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) 
 	return valAsbytes, nil
 }
 
-func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []string) (pb.Response) {
+func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Println("Starting init_user")
 	if len(args) != 3 {
-		return shim.Error("Incorrect number of arguments. Expecting 4")
+		return nil, shim.Error("Incorrect number of arguments. Expecting 4")
 	}
 				  
 	//input sanitation
 	err = sanitize_arguments(args)
 	if err != nil {
-		return shim.Error(err.Error())
+		return nil, shim.Error(err.Error())
 	}
 
 	email := args[0]
@@ -208,7 +208,7 @@ func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []str
 	if err == nil {
 		fmt.Println("This user already exists - " + email)
 		fmt.Println(project)
-		return shim.Error("This user exists - " + email)  //all stop a ticket by this id exists
+		return nil, shim.Error("This user exists - " + email)  //all stop a ticket by this id exists
 	}
 
 	//build the user json string manually
@@ -220,9 +220,9 @@ func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []str
 	}`
 	err = stub.PutState(email, []byte(str)) 	//store project with id as key
 	if err != nil {
-		return shim.Error(err.Error())
+		return nil, shim.Error(err.Error())
 	}
 
 	fmt.Println("- end init_user")
-	return shim.Success(nil)
+	return nil, nil
 }
