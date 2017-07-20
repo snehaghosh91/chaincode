@@ -120,6 +120,7 @@ func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) 
 }
 
 func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var err error
 	fmt.Println("Starting init_project")
 	if len(args) != 4 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 4")
@@ -189,6 +190,7 @@ func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) 
 }
 
 func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var err error
 	fmt.Println("Starting init_user")
 	if len(args) != 3 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 4")
