@@ -121,7 +121,7 @@ func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) 
 func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []string) (pb.Response) {
 	fmt.Println("Starting init_project")
 	if len(args) != 4 {
-		return shim.Error("Incorrect number of arguments. Expecting 4)
+		return shim.Error("Incorrect number of arguments. Expecting 4")
 	}
 				  
 	//input sanitation
