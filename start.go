@@ -67,6 +67,8 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		return t.init_user(stub, args)
 	} else if function == "init_project" {
 		return t.init_project(stub, args)
+	} else if function == "init_user_new" {
+		return t.init_user_new(stub, args)
 	}
 	fmt.Println("invoke did not find func: " + function)
 
