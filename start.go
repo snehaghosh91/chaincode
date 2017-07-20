@@ -125,12 +125,6 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 	if len(args) != 4 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 4")
 	}
-				  
-	//input sanitation
-	err = sanitize_arguments(args)
-	if err != nil {
-		return nil, errors.New(err.Error())
-	}
 
 	project_id := args[0]
 	name := args[1]
@@ -139,11 +133,11 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 	moneyDonated := 0
 
 	//check if owner exists
-	user, err := get_user(stub, owner)
-	if err != nil {
-		fmt.Println("Failed to find user - " + owner)
-		return nil, errors.New(err.Error())
-	}
+	//user, err := get_user(stub, owner)
+	//if err != nil {
+	//	fmt.Println("Failed to find user - " + owner)
+	//	return nil, errors.New(err.Error())
+	//}
 
 	//check if ticket id already exists
 	project, err := stub.GetState(project_id)
@@ -196,12 +190,6 @@ func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []str
 		return nil, errors.New("Incorrect number of arguments. Expecting 4")
 	}
 				  
-	//input sanitation
-	err = sanitize_arguments(args)
-	if err != nil {
-		return nil, errors.New(err.Error())
-	}
-
 	email := args[0]
 	firstname := args[1]
 	lastname := args[2]
