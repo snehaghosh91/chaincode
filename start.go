@@ -50,7 +50,7 @@ type ProjectUpdates struct {
 }
 
 type ProjectLikes struct {
-	ProjectName string `json:"pname"`
+	ProjectName string `json:"pname"`	
 	UserEmail string `json:"uemail"`
 }
 
