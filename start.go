@@ -40,7 +40,7 @@ type Project struct {
 	SponsorEmail string `json:"sponsoremail"`
 	Status string `json:"status"`
 	PledgeAmount int `json:"pledgeamount"`
-	Updates []ProjectUpdates 'json:"updates"'
+	Updates []ProjectUpdates `json:"updates"`
 }
 
 type ProjectUpdates struct {
