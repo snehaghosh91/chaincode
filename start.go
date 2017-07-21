@@ -353,9 +353,9 @@ func (t *SimpleChaincode) init_pledge(stub shim.ChaincodeStubInterface, args []s
 	if len(args) != 2 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 2")
 	}
-	projectName = args[0]
-	pledgeAmount = args[1]
-	project, _ = read(stub, projectName)
+	projectName := args[0]
+	pledgeAmount := args[1]
+	project, _ := read(stub, projectName)
 	project.pledgeAmount += pledgeAmount
 	err = stub.PutState(projectName, project)
 	if err != nil {
