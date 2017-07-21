@@ -1,12 +1,9 @@
 /*
 Copyright IBM Corp 2016 All Rights Reserved.
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
 		 http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,12 +14,44 @@ limitations under the License.
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
-	//"strconv"
+	"strconv"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	//pb "github.com/hyperledger/fabric/protos/peer"
 )
+type User struct {
+	Email string `json:"email"`
+	Firstname string `json:"firstname"`
+	Lastname string `json:"lastname"`
+	Password string `json:"password"`
+	Ccn string `json:"ccn"`
+	Phone string `json:"phone"` 
+}
+
+type Project struct {
+	Name string `json:"name"`
+	Description string `json:"description"`
+	Postdate string `json:"postdate"`
+	Enddate string `json:"enddate"`
+	Minfund int `json:"minfund"`
+	Maxfund int `json:"maxfund"`
+	SponsorEmail string `json:"sponsoremail"`
+	Status string `json:"status"`
+	PledgeAmount int `json:"pledgeamount"`
+}
+
+type ProjectUpdates struct {
+	ProjectName string `json:"pname"`
+	Date string `json:"udate"`
+	Text string `json:"utext"`
+}
+
+type ProjectLikes struct {
+	ProjectName string `json:"pname"`
+	UserEmail string `json:"uemail"`
+}
 
 // SimpleChaincode example simple Chaincode implementation
 type SimpleChaincode struct {
@@ -58,10 +87,20 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		return t.Init(stub, "init", args)
 	} else if function == "write" {
 		return t.write(stub, args)
+	} else if function == "init_user_old" {
+		return t.init_user_old(stub, args)
+	} else if function == "init_project_old" {
+		return t.init_project_old(stub, args)
 	} else if function == "init_user" {
 		return t.init_user(stub, args)
 	} else if function == "init_project" {
 		return t.init_project(stub, args)
+	} else if function == "init_pledge" {
+		return t.init_pledge(stub, args)
+	} else if function == "init_project_likes" {
+		return t.init_project_likes(stub, args)
+	} else if function == "init_project_updates" {
+		return t.init_project_updates(stub, args)
 	}
 	fmt.Println("invoke did not find func: " + function)
 
@@ -105,10 +144,6 @@ func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) 
 	var key, jsonResp string
 	var err error
 
-	if len(args) != 1 {
-		return nil, errors.New("Incorrect number of arguments. Expecting name of the key to query")
-	}
-
 	key = args[0]
 	valAsbytes, err := stub.GetState(key)
 	if err != nil {
@@ -119,9 +154,9 @@ func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) 
 	return valAsbytes, nil
 }
 
-func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+func (t *SimpleChaincode) init_project_old(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
-	fmt.Println("Starting init_project")
+	fmt.Println("Starting init_project_old")
 	if len(args) != 4 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 4")
 	}
@@ -161,13 +196,13 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 		return nil, errors.New(err.Error())
 	}
 
-	fmt.Println("- end init_project")
+	fmt.Println("- end init_project_old")
 	return nil, nil
 }
 
-func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+func (t *SimpleChaincode) init_user_old(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
-	fmt.Println("Starting init_user")
+	fmt.Println("Starting init_user_old")
 	if len(args) != 3 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 4")
 	}
@@ -195,6 +230,143 @@ func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []str
 		return nil, errors.New(err.Error())
 	}
 
-	fmt.Println("- end init_user")
+	fmt.Println("- end init_user_old")
 	return nil, nil
+}
+
+
+func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var err error
+	fmt.Println("Starting init_user")
+	if len(args) != 6 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 6")
+	}
+	user := User{};
+	user.Email =  args[0]
+	user.Firstname = args[1]
+	user.Lastname = args[2]
+	user.Password =  args[3]
+	user.Ccn = args[4]
+	user.Phone = args[5]
+	fmt.Println(user)
+	
+
+	//store user
+	userAsBytes, _ := json.Marshal(user)	//convert to array of bytes
+	err = stub.PutState(user.Email, userAsBytes)	  //store owner by its Id
+	if err != nil {
+		fmt.Println("Could not store user")
+		return nil, errors.New(err.Error())
+	}
+	
+	fmt.Println("- end init_user")
+	return nil, nil	
+}
+
+func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var err error
+	fmt.Println("Starting init_project")
+	if len(args) != 8 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 8")
+	}
+	project := Project{};
+	project.Name = args[0]
+	project.Description = args[1]
+	project.Postdate = args[2]
+	project.Enddate = args[3]
+	project.Minfund, _ = strconv.Atoi(args[4])
+	project.Maxfund, _ = strconv.Atoi(args[5])
+	project.SponsorEmail = args[6]
+	project.Status = args[7]
+	project.PledgeAmount = 0
+	fmt.Println(project)
+	
+
+	//store project
+	projectAsBytes, _ := json.Marshal(project)	//convert to array of bytes
+	err = stub.PutState(project.Name, projectAsBytes)	  //store owner by its Id
+	if err != nil {
+		fmt.Println("Could not store project")
+		return nil, errors.New(err.Error())
+	}
+	
+	fmt.Println("- end init_project")
+	return nil, nil	
+}
+
+func (t *SimpleChaincode) init_project_likes(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var err error
+	fmt.Println("Starting init_project_likes")
+	if len(args) != 2 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 2")
+	}
+	project_likes := ProjectLikes{};
+	project_likes.ProjectName = args[0]
+	project_likes.UserEmail = args[1]
+	fmt.Println(project_likes)
+	
+
+	//store project_likes
+	projectLikesAsBytes, _ := json.Marshal(project_likes)	//convert to array of bytes
+	err = stub.PutState(project_likes.ProjectName, projectLikesAsBytes)	  //store owner by its Id
+	if err != nil {
+		fmt.Println("Could not store project_likes")
+		return nil, errors.New(err.Error())
+	}
+	
+	fmt.Println("- end init_project_likes")
+	return nil, nil	
+}
+
+func (t *SimpleChaincode) init_project_updates(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var err error
+	fmt.Println("Starting init_project_updates")
+	if len(args) != 3 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 3")
+	}
+	project_updates := ProjectUpdates{};
+	project_updates.ProjectName = args[0]
+	project_updates.Date = args[1]
+	project_updates.Text = args[2]
+	fmt.Println(project_updates)
+	
+
+	//store project_updates
+	projectUpdatesAsBytes, _ := json.Marshal(project_updates)	//convert to array of bytes
+	err = stub.PutState(project_updates.ProjectName, projectUpdatesAsBytes)	  //store owner by its Id
+	if err != nil {
+		fmt.Println("Could not store project_updates")
+		return nil, errors.New(err.Error())
+	}
+	
+	fmt.Println("- end init_project_updates")
+	return nil, nil	
+}
+
+func (t *SimpleChaincode) init_pledge(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var err error
+	fmt.Println("Starting init_pledge")
+	if len(args) != 2 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 2")
+	}
+	projectName := args[0]
+	pledgeAmount := args[1]
+	var project Project
+	projectAsBytes, _ := t.read(stub, args)
+	fmt.Println("Read the project as bytes")
+	json.Unmarshal(projectAsBytes, &project)
+	fmt.Printf("%+v\n", project)
+	currentPledge, _ := strconv.Atoi(pledgeAmount)
+	project.PledgeAmount += currentPledge
+	fmt.Printf("%+v\n", project)
+	projectAsBytes, _ = json.Marshal(project)
+	
+	err = stub.PutState(projectName, projectAsBytes)
+	if err != nil {
+		fmt.Println("Could not store pledge")
+		return nil, errors.New(err.Error())
+	}
+	
+	fmt.Println("- end init_pledge")
+	return nil, nil	
 }
