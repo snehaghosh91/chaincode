@@ -81,7 +81,7 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 	
 	var emptyProjectIndex []string
 	jsonAsBytes, _ := json.Marshal(emptyProjectIndex)
-	err = stub.putState(projectIndexString, jsonAsBytes)
+	err = stub.PutState(projectIndexStr, jsonAsBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -303,7 +303,7 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 	}
 	
 	//Store project in the index
-	projectsAsBytes, err := sub.getState(projectIndexStr)
+	projectsAsBytes, err := sub.GetState(projectIndexStr)
 	if err != nil {
 		return nil, errors.New("Failed to get marble index")
 	}
