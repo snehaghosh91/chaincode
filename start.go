@@ -342,10 +342,10 @@ func (t *SimpleChaincode) init_project_updates(stub shim.ChaincodeStubInterface,
 
 	projectAsBytes, err := stub.GetState(project_updates.ProjectName)
 	if err != nil {
-		fmt.println("Project does not exist: ", project.ProjectName)
+		fmt.Println("Project does not exist: ", project.ProjectName)
 		return nil, errors.New(err.Error())
 	}
-	var project := Project{}
+	project := Project{}
 	json.Unmarshal(projectAsBytes, &project)
 
 	project.Updates = append(project.Updates, project_updates)
@@ -370,7 +370,7 @@ func (t *SimpleChaincode) init_pledge(stub shim.ChaincodeStubInterface, args []s
 	}
 	projectName := args[0]
 	pledgeAmount := args[1]
-	var project Project{}
+	project := Project{}
 	projectAsBytes, _ := t.read(stub, args)
 	fmt.Println("Read the project as bytes")
 	json.Unmarshal(projectAsBytes, &project)
