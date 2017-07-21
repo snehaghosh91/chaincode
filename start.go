@@ -347,9 +347,9 @@ func (t *SimpleChaincode) init_project_updates(stub shim.ChaincodeStubInterface,
 	json.Unmarshal(projectAsBytes, &project)
 
 	project.Updates = append(project.Updates, project_updates)
-	projectAsBytes, _ := json.Marshal(project)
+	projectAsBytesFinal, _ := json.Marshal(project)
 
-	err = stub.PutState(project_updates.ProjectName, projectAsBytes)
+	err = stub.PutState(project_updates.ProjectName, projectAsBytesFinal)
 	if err != nil {
 		fmt.Println("Could not store project_updates")
 		return nil, errors.New(err.Error())
