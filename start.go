@@ -99,6 +99,14 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		return t.init_project_old(stub, args)
 	} else if function == "init_user" {
 		return t.init_user(stub, args)
+	} else if function == "init_project" {
+		return t.init_project(stub, args)
+	} else if function == "init_pledge" {
+		return t.init_pledge(stub, args)
+	} else if function == "init_project_likes" {
+		return t.init_project_likes(stub, args)
+	} else if function == "init_project_updates" {
+		return t.init_project_updates(stub, args)
 	}
 	fmt.Println("invoke did not find func: " + function)
 
