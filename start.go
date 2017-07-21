@@ -21,6 +21,9 @@ import (
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	//pb "github.com/hyperledger/fabric/protos/peer"
 )
+
+var projectIndexStr = "_projectindex"
+
 type User struct {
 	Email string `json:"email"`
 	Firstname string `json:"firstname"`
@@ -72,6 +75,13 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 	}
 
 	err := stub.PutState("hello_world", []byte(args[0]))
+	if err != nil {
+		return nil, err
+	}
+	
+	var emptyProjectIndex []string
+	jsonAsBytes, _ := json.Marshal(emptyProjectIndex)
+	err = stub.putState(projectIndexString, jsonAsBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -291,6 +301,21 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 		fmt.Println("Could not store project")
 		return nil, errors.New(err.Error())
 	}
+	
+	//Store project in the index
+	projectsAsBytes, err := sub.getState(projectIndexStr)
+	if err != nil {
+		return nil, errors.New("Failed to get marble index")
+	}
+	var projectIndex []string
+	json.Unmarshal(projectsAsBytes, &projectIndex)							//un stringify it aka JSON.parse()
+	
+	//append
+	projectIndex = append(projectIndex, project.Name)									//add project name to index list
+	fmt.Println("! project index: ", projectIndex)
+	jsonAsBytes, _ := json.Marshal(projectIndex)
+	err = stub.PutState(projectIndexStr, jsonAsBytes)						//store name of marble
+
 	
 	fmt.Println("- end init_project")
 	return nil, nil	
