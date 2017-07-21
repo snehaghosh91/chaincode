@@ -39,6 +39,7 @@ type Project struct {
 	Maxfund int `json:"maxfund"`
 	SponsorEmail string `json:"sponsoremail"`
 	Status string `json:"status"`
+	PledgeAmount int `json:"pledgeamount"`
 }
 
 type ProjectUpdates struct {
@@ -50,13 +51,6 @@ type ProjectUpdates struct {
 type ProjectLikes struct {
 	ProjectName string `json:"pname"`
 	UserEmail string `json:"uemail"`
-}
-
-type Pledge struct {
-	ProjectName string `json:"pname"`
-	UserEmail string `json:"uemail"`
-	Amount int `json:"pamount"`
-	Date string `json:"udate"`
 }
 
 // SimpleChaincode example simple Chaincode implementation
@@ -288,6 +282,7 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 	project.Maxfund, _ = strconv.Atoi(args[5])
 	project.SponsorEmail = args[6]
 	project.Status = args[7]
+	project.PledgeAmount = 0
 	fmt.Println(project)
 	
 
@@ -355,20 +350,14 @@ func (t *SimpleChaincode) init_project_updates(stub shim.ChaincodeStubInterface,
 func (t *SimpleChaincode) init_pledge(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
 	fmt.Println("Starting init_pledge")
-	if len(args) != 4 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 4")
+	if len(args) != 2 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 2")
 	}
-	pledge := Pledge{};
-	pledge.ProjectName = args[0]
-	pledge.UserEmail = args[1]
-	pledge.Amount, _ = strconv.Atoi(args[2])
-	pledge.Date = args[3]
-	fmt.Println(pledge)
-	
-
-	//store pledge
-	pledgeAsBytes, _ := json.Marshal(pledge)	//convert to array of bytes
-	err = stub.PutState(pledge.ProjectName, pledgeAsBytes)	  //store owner by its Id
+	projectName = args[0]
+	pledgeAmount = args[1]
+	project, _ = read(stub, projectName)
+	project.pledgeAmount += pledgeAmount
+	err = stub.PutState(projectName, project)
 	if err != nil {
 		fmt.Println("Could not store pledge")
 		return nil, errors.New(err.Error())
