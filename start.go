@@ -40,6 +40,7 @@ type Project struct {
 	SponsorEmail string `json:"sponsoremail"`
 	Status string `json:"status"`
 	PledgeAmount int `json:"pledgeamount"`
+	Updates []ProjectUpdates 'json:"updates"'
 }
 
 type ProjectUpdates struct {
@@ -101,6 +102,8 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		return t.init_project_likes(stub, args)
 	} else if function == "init_project_updates" {
 		return t.init_project_updates(stub, args)
+	} else if function == "update_project" {
+		return t.update_project(stub, args)
 	}
 	fmt.Println("invoke did not find func: " + function)
 
@@ -279,6 +282,7 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 	project.SponsorEmail = args[6]
 	project.Status = args[7]
 	project.PledgeAmount = 0
+	project.Updates = []ProjectUpdates{}
 	fmt.Println(project)
 	
 
@@ -329,16 +333,31 @@ func (t *SimpleChaincode) init_project_updates(stub shim.ChaincodeStubInterface,
 	project_updates.Date = args[1]
 	project_updates.Text = args[2]
 	fmt.Println(project_updates)
-	
+
 
 	//store project_updates
 	projectUpdatesAsBytes, _ := json.Marshal(project_updates)	//convert to array of bytes
 	err = stub.PutState(project_updates.ProjectName, projectUpdatesAsBytes)	  //store owner by its Id
+
+
+	projectAsBytes, err := stub.GetState(project_updates.ProjectName)
+	if err != nil {
+		fmt.println("Project does not exist: ", project.ProjectName)
+		return nil, errors.New(err.Error())
+	}
+	var project := Project{}
+	json.Unmarshal(projectAsBytes, &project)
+
+	project.Updates = append(project.Updates, project_updates)
+	projectAsBytes = json.Marshal(project)
+
+	err = stub.PutState(project_updates.ProjectName, project)
 	if err != nil {
 		fmt.Println("Could not store project_updates")
 		return nil, errors.New(err.Error())
 	}
-	
+
+
 	fmt.Println("- end init_project_updates")
 	return nil, nil	
 }
@@ -351,7 +370,7 @@ func (t *SimpleChaincode) init_pledge(stub shim.ChaincodeStubInterface, args []s
 	}
 	projectName := args[0]
 	pledgeAmount := args[1]
-	var project Project
+	var project Project{}
 	projectAsBytes, _ := t.read(stub, args)
 	fmt.Println("Read the project as bytes")
 	json.Unmarshal(projectAsBytes, &project)
