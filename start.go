@@ -17,7 +17,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	//"strconv"
+	"strconv"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	//pb "github.com/hyperledger/fabric/protos/peer"
 )
@@ -26,8 +26,8 @@ type User struct {
 	Firstname string `json:"firstname"`
 	Lastname string `json:"lastname"`
 	Password string `json:"password"`
-	Ccn int `json:"ccn"`
-	Phone int `json:"phone"` 
+	Ccn string `json:"ccn"`
+	Phone string `json:"phone"` 
 }
 
 type Project struct {
@@ -272,14 +272,14 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 		return nil, errors.New("Incorrect number of arguments. Expecting 8")
 	}
 	project := Project{};
-	project.Name := args[0]
-	project.Description := args[1]
-	project.Postdate := args[2]
-	project.Enddate := args[3]
-	project.Minfund := args[4]
-	project.Maxfund := args[5]
-	project.SponsorEmail := args[6]
-	project.Status := args[7]
+	project.Name = args[0]
+	project.Description = args[1]
+	project.Postdate = args[2]
+	project.Enddate = args[3]
+	project.Minfund = strconv.Atoi(args[4])
+	project.Maxfund = strconv.Atoi(args[5])
+	project.SponsorEmail = args[6]
+	project.Status = args[7]
 	fmt.Println(project)
 	
 
@@ -302,8 +302,8 @@ func (t *SimpleChaincode) init_project_likes(stub shim.ChaincodeStubInterface, a
 		return nil, errors.New("Incorrect number of arguments. Expecting 2")
 	}
 	project_likes := ProjectLikes{};
-	project_likes.ProjectName := args[0]
-	project_likes.UserEmail := args[1]
+	project_likes.ProjectName = args[0]
+	project_likes.UserEmail = args[1]
 	fmt.Println(project_likes)
 	
 
@@ -326,9 +326,9 @@ func (t *SimpleChaincode) init_project_updates(stub shim.ChaincodeStubInterface,
 		return nil, errors.New("Incorrect number of arguments. Expecting 3")
 	}
 	project_updates := ProjectUpdates{};
-	project_updates.ProjectName := args[0]
-	project_updates.Date := args[1]
-	project_updates.Text := args[2]
+	project_updates.ProjectName = args[0]
+	project_updates.Date = args[1]
+	project_updates.Text = args[2]
 	fmt.Println(project_updates)
 	
 
@@ -351,10 +351,10 @@ func (t *SimpleChaincode) init_pledge(stub shim.ChaincodeStubInterface, args []s
 		return nil, errors.New("Incorrect number of arguments. Expecting 4")
 	}
 	pledge := Pledge{};
-	pledge.ProjectName := args[0]
-	pledge.UserEmail := args[1]
-	pledge.Amount := args[2]
-	pledge.Date := args[3]
+	pledge.ProjectName = args[0]
+	pledge.UserEmail = args[1]
+	pledge.Amount = strconv.Atoi(args[2])
+	pledge.Date = args[3]
 	fmt.Println(pledge)
 	
 
