@@ -358,7 +358,8 @@ func (t *SimpleChaincode) init_pledge(stub shim.ChaincodeStubInterface, args []s
 	var project Project
 	projectAsBytes, _ := t.read(stub, args)
 	json.Unmarshal(projectAsBytes, &project)
-	project.PledgeAmount += strconv.Atoi(pledgeAmount)
+	currentPledge, _ := strconv.Atoi(pledgeAmount)
+	project.PledgeAmount += currentPledge
 	projectAsBytes, _ = json.Marshal(project)
 	
 	err = stub.PutState(projectName, projectAsBytes)
