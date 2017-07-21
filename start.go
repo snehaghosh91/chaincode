@@ -276,8 +276,8 @@ func (t *SimpleChaincode) init_project(stub shim.ChaincodeStubInterface, args []
 	project.Description = args[1]
 	project.Postdate = args[2]
 	project.Enddate = args[3]
-	project.Minfund = strconv.Atoi(args[4])
-	project.Maxfund = strconv.Atoi(args[5])
+	project.Minfund, _ = strconv.Atoi(args[4])
+	project.Maxfund, _ = strconv.Atoi(args[5])
 	project.SponsorEmail = args[6]
 	project.Status = args[7]
 	fmt.Println(project)
@@ -353,7 +353,7 @@ func (t *SimpleChaincode) init_pledge(stub shim.ChaincodeStubInterface, args []s
 	pledge := Pledge{};
 	pledge.ProjectName = args[0]
 	pledge.UserEmail = args[1]
-	pledge.Amount = strconv.Atoi(args[2])
+	pledge.Amount, _ = strconv.Atoi(args[2])
 	pledge.Date = args[3]
 	fmt.Println(pledge)
 	
