@@ -355,7 +355,7 @@ func (t *SimpleChaincode) init_pledge(stub shim.ChaincodeStubInterface, args []s
 	}
 	projectName := args[0]
 	pledgeAmount := args[1]
-	project, _ := read(stub, [1]string{projectName})
+	project, _ := t.read(stub, [1]string{projectName})
 	project.pledgeAmount += pledgeAmount
 	err = stub.PutState(projectName, project)
 	if err != nil {
