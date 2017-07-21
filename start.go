@@ -247,9 +247,9 @@ func (t *SimpleChaincode) init_user(stub shim.ChaincodeStubInterface, args []str
 	user.Email =  args[0]
 	user.Firstname = args[1]
 	user.Lastname = args[2]
-	user.Password =  args[0]
-	user.Ccn = args[1]
-	user.Phone = args[2]
+	user.Password =  args[3]
+	user.Ccn = args[4]
+	user.Phone = args[5]
 	fmt.Println(user)
 	
 
