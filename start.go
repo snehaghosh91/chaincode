@@ -340,16 +340,16 @@ func (t *SimpleChaincode) init_project_updates(stub shim.ChaincodeStubInterface,
 
 	projectAsBytes, err := stub.GetState(project_updates.ProjectName)
 	if err != nil {
-		fmt.Println("Project does not exist: ", project.ProjectName)
+		fmt.Println("Project does not exist: ", project_updates.ProjectName)
 		return nil, errors.New(err.Error())
 	}
 	project := Project{}
 	json.Unmarshal(projectAsBytes, &project)
 
 	project.Updates = append(project.Updates, project_updates)
-	projectAsBytes = json.Marshal(project)
+	projectAsBytes, _ := json.Marshal(project)
 
-	err = stub.PutState(project_updates.ProjectName, project)
+	err = stub.PutState(project_updates.ProjectName, projectAsBytes)
 	if err != nil {
 		fmt.Println("Could not store project_updates")
 		return nil, errors.New(err.Error())
