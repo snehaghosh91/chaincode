@@ -332,12 +332,6 @@ func (t *SimpleChaincode) init_project_updates(stub shim.ChaincodeStubInterface,
 	project_updates.Text = args[2]
 	fmt.Println(project_updates)
 
-
-	//store project_updates
-	projectUpdatesAsBytes, _ := json.Marshal(project_updates)	//convert to array of bytes
-	err = stub.PutState(project_updates.ProjectName, projectUpdatesAsBytes)	  //store owner by its Id
-
-
 	projectAsBytes, err := stub.GetState(project_updates.ProjectName)
 	if err != nil {
 		fmt.Println("Project does not exist: ", project_updates.ProjectName)
