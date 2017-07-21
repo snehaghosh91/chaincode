@@ -102,8 +102,6 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		return t.init_project_likes(stub, args)
 	} else if function == "init_project_updates" {
 		return t.init_project_updates(stub, args)
-	} else if function == "update_project" {
-		return t.update_project(stub, args)
 	}
 	fmt.Println("invoke did not find func: " + function)
 
